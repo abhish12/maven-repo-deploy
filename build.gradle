@@ -1,0 +1,27 @@
+apply plugin: 'java' 
+repositories {mavenLocal()}
+dependencies {
+compile 'junit:junit:3.8.1'
+compile 'org.checkerframework:checker:1.9.4'
+compile 'org.checkerframework:checker-qual:1.9.4'
+compile 'org.checkerframework:jdk8:1.9.4'
+ }
+
+ task createBuildInfoFile << {
+ def buildInfoFile = new File("$buildDir/build-info.properties") 
+ Properties props = new Properties() 
+ props.setProperty('version', project.version.toString()) 
+ props.store(buildInfoFile.newWriter(), null)
+} 
+
+jar  {
+dependsOn createBuildInfoFile 
+ baseName = 'my-app' 
+ }
+
+task zip(type: Zip)   {
+ dependsOn createBuildInfoFile,jar 
+ baseName = 'my-app' 
+ from("$buildDir/libs") { 
+ include 'my-app.jar'  }
+ into('libs') {from configurations.runtime } }
